@@ -12,7 +12,7 @@ class LendingSqlParamsFactory {
 	static Map<String, Object> create(LendableBook.Snapshot book) {
 		return Map.of(
 			"id", book.id(),
-			"copyId", book.copyId(),
+			"volumeId", book.copyId(),
 			"userId", book.userId(),
 			"expectedReturnDate", book.expectedReturnDate(),
 			"returnedAt", book.returnedAt()

@@ -6,10 +6,12 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
+import library.inventory.Volume;
+
 public class LendableBook {
 
 	private final Id id;
-	private final CopyId copyId;
+	private final Volume.Id volumeId;
 	private final UserId userId;
 	private LocalDateTime createdAt;
 	private LocalDate expectedReturnDate;
@@ -20,7 +22,7 @@ public class LendableBook {
 		Objects.requireNonNull(rent, "checkout missing");
 
 		this.id = id;
-		this.copyId = rent.copyId();
+		this.volumeId = rent.volumeId();
 		this.userId = rent.userId();
 	}
 
@@ -31,7 +33,7 @@ public class LendableBook {
 	private LendableBook(Snapshot snapshot) {
 		Objects.requireNonNull(snapshot);
 		this.id = snapshot.id();
-		this.copyId = snapshot.copyId();
+		this.volumeId = snapshot.volumeId();
 		this.userId = snapshot.userId();
 		this.createdAt = snapshot.createdAt();
 		this.expectedReturnDate = snapshot.expectedReturnDate();
@@ -53,7 +55,7 @@ public class LendableBook {
 	public Snapshot snapshot() {
 		return new Snapshot(
 			id,
-			copyId,
+			volumeId,
 			userId,
 			createdAt,
 			expectedReturnDate,
@@ -63,7 +65,7 @@ public class LendableBook {
 
 	public record Snapshot(
 		Id id,
-		CopyId copyId,
+		Volume.Id volumeId,
 		UserId userId,
 		LocalDateTime createdAt,
 		LocalDate expectedReturnDate,
@@ -72,7 +74,7 @@ public class LendableBook {
 
 		public Snapshot {
 			Objects.requireNonNull(id, "book id missing");
-			Objects.requireNonNull(copyId, "copy id missing");
+			Objects.requireNonNull(volumeId, "volume id missing");
 			Objects.requireNonNull(userId, "user id missing");
 			Objects.requireNonNull(createdAt, "created at missing");
 		}
@@ -104,27 +106,6 @@ public class LendableBook {
 
 	}
 
-	public record CopyId(UUID value) {
-
-		public CopyId {
-			Objects.requireNonNull(value, "copy id missing");
-		}
-
-		public static CopyId generate() {
-			return new CopyId(UUID.randomUUID());
-		}
-
-		public static CopyId fromString(String value) {
-			return new CopyId(UUID.fromString(value));
-		}
-
-		@Override
-		public String toString() {
-			return value.toString();
-		}
-
-	}
-
 	public record UserId(UUID value) {
 
 		public UserId {
@@ -146,10 +127,10 @@ public class LendableBook {
 
 	}
 
-	public record Rent(CopyId copyId, UserId userId) {
+	public record Rent(Volume.Id volumeId, UserId userId) {
 
 		public Rent {
-			Objects.requireNonNull(copyId, "copy id missing");
+			Objects.requireNonNull(volumeId, "volume id missing");
 			Objects.requireNonNull(userId, "user id missing");
 		}
 
@@ -181,8 +162,8 @@ public class LendableBook {
 
 	public static class Unavailable extends RuntimeException {
 
-		public Unavailable(CopyId copyId) {
-			super("Copy " + copyId + " is not available");
+		public Unavailable(Volume.Id volumeId) {
+			super("Copy " + volumeId + " is not available");
 		}
 
 	}

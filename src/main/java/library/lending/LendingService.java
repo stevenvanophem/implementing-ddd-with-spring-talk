@@ -5,6 +5,8 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import library.inventory.Volume;
+
 public class LendingService {
 
 	private static final Logger logger = LoggerFactory.getLogger(LendingService.class);
@@ -23,14 +25,14 @@ public class LendingService {
 	public LendableBook.Snapshot rent(LendableBook.Rent command) {
 		Objects.requireNonNull(command);
 
-		final LendableBook.CopyId copyId = command.copyId();
+		final Volume.Id volumeId = command.volumeId();
 		final LendableBook.Id id = LendableBook.Id.generate();
 
-		logger.debug("Checkout copy {} as loan {}", copyId, id);
+		logger.debug("Checkout volume {} as loan {}", volumeId, id);
 		logger.trace("{}", command);
 
-		if (!repository.isAvailable(copyId))
-			throw new LendableBook.Unavailable(copyId);
+		if (!repository.isAvailable(volumeId))
+			throw new LendableBook.Unavailable(volumeId);
 
 		return LendableBook.rent(id, command).snapshot()
 			.map(repository::save)

@@ -20,7 +20,7 @@ class LendableBookSnapshotRowMapper implements RowMapper<LendableBook.Snapshot> 
 
 		return new LendableBook.Snapshot(
 			LendableBook.Id.fromString(resultSet.getString("id")),
-			LendableBook.CopyId.fromString(resultSet.getString("copyId")),
+			LendableBook.CopyId.fromString(resultSet.getString("volumeId")),
 			LendableBook.UserId.fromString(resultSet.getString("userId")),
 			createdAt,
 			expectedReturnDate,

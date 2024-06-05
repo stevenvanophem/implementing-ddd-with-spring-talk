@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
+import library.inventory.Volume;
 import library.lending.LendableBook;
 import library.lending.LendingRepository;
 
@@ -21,13 +22,13 @@ public class LendingJdbcRepository implements LendingRepository {
 	}
 
 	@Override
-	public boolean isAvailable(LendableBook.CopyId id) {
+	public boolean isAvailable(Volume.Id id) {
 		Objects.requireNonNull(id);
 
 		final String sql = """
 			select count(*) = 0 
 			from Loan 
-			where copyId = :id 
+			where volumeId = :id 
 			and returnedAt is null
 			""";
 
@@ -35,7 +36,7 @@ public class LendingJdbcRepository implements LendingRepository {
 		logger.trace("{} - {}", sql, id);
 
 		Integer result = jdbcClient.sql(sql)
-			.param("id", id)
+			.param("id", id.toString())
 			.query(Integer.class)
 			.single();
 
