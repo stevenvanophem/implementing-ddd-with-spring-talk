@@ -39,6 +39,18 @@ public class Book {
 		return function.apply(this);
 	}
 
+	public Id id() {
+		return id;
+	}
+
+	public Title title() {
+		return title;
+	}
+
+	public Isbn isbn() {
+		return isbn;
+	}
+
 	public record Id(UUID value) {
 
 		public Id {

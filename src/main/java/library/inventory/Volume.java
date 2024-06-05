@@ -13,16 +13,16 @@ public class Volume {
 	private final BarCode barCode;
 	private boolean available;
 
-	private Volume(Snapshot snapshot) {
-		Objects.requireNonNull(snapshot, "volume snapshot missing");
-		this.id = snapshot.id();
-		this.bookId = snapshot.bookId();
-		this.barCode = snapshot.barCode();
-		this.available = snapshot.available();
+	private Volume(Load load) {
+		Objects.requireNonNull(load, "volume snapshot missing");
+		this.id = load.id();
+		this.bookId = load.bookId();
+		this.barCode = load.barCode();
+		this.available = load.available();
 	}
 
-	public static Volume load(Snapshot snapshot) {
-		return new Volume(snapshot);
+	public static Volume load(Load load) {
+		return new Volume(load);
 	}
 
 	private Volume(Cataloging command) {
@@ -46,13 +46,24 @@ public class Volume {
 		return this;
 	}
 
-	public Snapshot snapshot() {
-		return new Snapshot(
-			id,
-			bookId,
-			barCode,
-			available
-		);
+	public <T> T map(Function<Volume, T> function) {
+		return function.apply(this);
+	}
+
+	public Id id() {
+		return id;
+	}
+
+	public Book.Id bookId() {
+		return bookId;
+	}
+
+	public BarCode barCode() {
+		return barCode;
+	}
+
+	public boolean available() {
+		return available;
 	}
 
 	public record Id(UUID value) {
@@ -86,21 +97,17 @@ public class Volume {
 
 	}
 
-	public record Snapshot(
+	public record Load(
 		Id id,
 		Book.Id bookId,
 		BarCode barCode,
 		boolean available
 	) {
 
-		public Snapshot {
+		public Load {
 			Objects.requireNonNull(id, "volume id missing");
 			Objects.requireNonNull(bookId, "book id missing");
 			Objects.requireNonNull(barCode, "bar code missing");
-		}
-
-		public <T> T map(Function<Snapshot, T> function) {
-			return function.apply(this);
 		}
 
 	}
@@ -113,7 +120,7 @@ public class Volume {
 
 	}
 
-	public record Loaned(Volume.Snapshot volume) {
+	public record Loaned(Volume volume) {
 
 		public Loaned {
 			Objects.requireNonNull(volume, "volume missing");
@@ -129,7 +136,7 @@ public class Volume {
 
 	}
 
-	public record CheckedIn(Volume.Snapshot volume) {
+	public record CheckedIn(Volume volume) {
 
 		public CheckedIn {
 			Objects.requireNonNull(volume, "volume missing");
@@ -146,7 +153,7 @@ public class Volume {
 
 	}
 
-	public record Catalogued(Volume.Snapshot volume) {
+	public record Catalogued(Volume volume) {
 
 		public Catalogued {
 			Objects.requireNonNull(volume, "volume missing");

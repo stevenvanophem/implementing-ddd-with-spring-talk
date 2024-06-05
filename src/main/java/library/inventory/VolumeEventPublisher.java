@@ -4,22 +4,22 @@ public interface VolumeEventPublisher {
 
 	void publish(Object event);
 
-	default Volume.Snapshot loaned(Volume.Snapshot volume) {
+	default Volume loaned(Volume volume) {
 		final var event = new Volume.Loaned(volume);
 		this.publish(event);
 		return volume;
 	}
 
-	default Volume checkedIn(Volume.Snapshot volume) {
+	default Volume checkedIn(Volume volume) {
 		final var event = new Volume.CheckedIn(volume);
 		this.publish(event);
-		return Volume.load(volume);
+		return volume;
 	}
 
-	default Volume.Snapshot cataloged(Volume.Snapshot snapshot) {
-		final var event = new Volume.Catalogued(snapshot);
+	default Volume cataloged(Volume volume) {
+		final var event = new Volume.Catalogued(volume);
 		this.publish(event);
-		return snapshot;
+		return volume;
 	}
 
 }

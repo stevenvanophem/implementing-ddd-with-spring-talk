@@ -16,12 +16,12 @@ public class VolumeJdbcRepository implements VolumeRepository {
 	}
 
 	@Override
-	public Optional<Volume.Snapshot> findById(Volume.Id id) {
+	public Optional<Volume> findById(Volume.Id id) {
 		return Optional.empty();
 	}
 
 	@Override
-	public Volume.Snapshot save(Volume.Snapshot volume) {
+	public Volume save(Volume volume) {
 		return null;
 	}
 

@@ -32,7 +32,7 @@ public class InventoryEventListener {
 		final Volume.Id volumeId = event.book().volumeId();
 		final var command = new Volume.Loan(volumeId);
 
-		Volume.Snapshot volume = inventory.loan(command);
+		Volume volume = inventory.loan(command);
 		logger.debug("Volume loaned: {}", volume);
 	}
 

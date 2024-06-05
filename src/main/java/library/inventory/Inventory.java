@@ -17,19 +17,18 @@ public class Inventory {
 		this.repository = repository;
 	}
 
-	public Volume.Snapshot cataloging(Volume.Cataloging command) {
+	public Volume cataloging(Volume.Cataloging command) {
 		Objects.requireNonNull(command);
 
 		logger.debug("Cataloging a new volume");
 		logger.trace("{}", command);
 
 		return Volume.cataloging(command)
-			.snapshot()
 			.map(repository::save)
 			.map(eventPublisher::cataloged);
 	}
 
-	public Volume.Snapshot loan(Volume.Loan command) {
+	public Volume loan(Volume.Loan command) {
 		Objects.requireNonNull(command);
 
 		final Volume.Id id = command.id();
@@ -38,9 +37,7 @@ public class Inventory {
 		logger.trace("{}", command);
 
 		return repository.findById(id).orElseThrow(() -> new Volume.NotFound(id))
-			.map(Volume::load)
 			.loan()
-			.snapshot()
 			.map(repository::save)
 			.map(eventPublisher::loaned);
 	}
@@ -54,9 +51,7 @@ public class Inventory {
 		logger.trace("{}", command);
 
 		return repository.findById(id).orElseThrow(() -> new Volume.NotFound(id))
-			.map(Volume::load)
 			.checkIn()
-			.snapshot()
 			.map(repository::save)
 			.map(eventPublisher::checkedIn);
 	}
