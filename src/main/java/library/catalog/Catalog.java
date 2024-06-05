@@ -23,7 +23,7 @@ public class Catalog {
 		this.repository = repository;
 	}
 
-	public Book.Snapshot add(Book.Add command) {
+	public Book add(Book.Add command) {
 		Objects.requireNonNull(command);
 
 		final Book.Isbn isbn = command.isbn();
@@ -33,7 +33,6 @@ public class Catalog {
 		logger.trace("{} - {}", command, title);
 
 		return Book.add(command, title)
-			.snapshot()
 			.map(repository::save)
 			.map(eventPublisher::added);
 	}

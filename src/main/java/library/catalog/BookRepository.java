@@ -2,6 +2,6 @@ package library.catalog;
 
 public interface BookRepository {
 
-	Book.Snapshot save(Book.Snapshot snapshot);
+	Book save(Book book);
 
 }

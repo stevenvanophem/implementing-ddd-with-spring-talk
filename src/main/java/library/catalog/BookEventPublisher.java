@@ -4,10 +4,10 @@ public interface BookEventPublisher {
 
 	void publish(Object event);
 
-	default Book.Snapshot added(Book.Snapshot snapshot) {
-		Book.Added added = new Book.Added(snapshot);
+	default Book added(Book book) {
+		final var added = new Book.Added(book);
 		this.publish(added);
-		return snapshot;
+		return book;
 	}
 
 }

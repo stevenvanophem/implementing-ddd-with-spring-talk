@@ -14,7 +14,7 @@ public class BookJdbcRepository implements BookRepository {
 	}
 
 	@Override
-	public Book.Snapshot save(Book.Snapshot snapshot) {
+	public Book save(Book book) {
 		return null;
 	}
 

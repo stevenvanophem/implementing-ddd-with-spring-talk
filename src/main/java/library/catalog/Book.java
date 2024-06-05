@@ -6,23 +6,21 @@ import java.util.function.Function;
 
 import org.apache.commons.validator.routines.ISBNValidator;
 
-import library.inventory.Volume;
-
 public class Book {
 
 	private final Id id;
 	private final Title title;
 	private final Isbn isbn;
 
-	private Book(Snapshot command) {
+	private Book(Load command) {
 		Objects.requireNonNull(command);
 		this.id = command.id();
 		this.title = command.title();
 		this.isbn = command.isbn();
 	}
 
-	public static Book load(Snapshot snapshot) {
-		return new Book(snapshot);
+	public static Book load(Load load) {
+		return new Book(load);
 	}
 
 	private Book(Add command, Title title) {
@@ -37,12 +35,8 @@ public class Book {
 		return new Book(command, title);
 	}
 
-	public Snapshot snapshot() {
-		return new Snapshot(
-			id,
-			title,
-			isbn
-		);
+	public <T> T map(Function<Book, T> function) {
+		return function.apply(this);
 	}
 
 	public record Id(UUID value) {
@@ -99,20 +93,16 @@ public class Book {
 
 	}
 
-	public record Snapshot(
+	public record Load(
 		Id id,
 		Title title,
 		Isbn isbn
 	) {
 
-		public Snapshot {
+		public Load {
 			Objects.requireNonNull(id, "book id missing");
 			Objects.requireNonNull(title, "book title missing");
 			Objects.requireNonNull(isbn, "book isbn missing");
-		}
-
-		public <T> T map(Function<Snapshot, T> function) {
-			return function.apply(this);
 		}
 
 	}
@@ -125,10 +115,10 @@ public class Book {
 
 	}
 
-	public record Added(Snapshot snapshot) {
+	public record Added(Book book) {
 
 		public Added {
-			Objects.requireNonNull(snapshot, "book missing");
+			Objects.requireNonNull(book, "book missing");
 		}
 
 	}
