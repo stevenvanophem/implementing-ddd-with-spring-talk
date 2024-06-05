@@ -7,21 +7,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
-import library.lending.CirculatingBook;
-import library.lending.CirculationRepository;
+import library.lending.LendableBook;
+import library.lending.LendingRepository;
 
-public class CirculationJdbcRepository implements CirculationRepository {
+public class LendingJdbcRepository implements LendingRepository {
 
-	private static final Logger logger = LoggerFactory.getLogger(CirculationJdbcRepository.class);
+	private static final Logger logger = LoggerFactory.getLogger(LendingJdbcRepository.class);
 
 	private final JdbcClient jdbcClient;
 
-	public CirculationJdbcRepository(JdbcClient jdbcClient) {
+	public LendingJdbcRepository(JdbcClient jdbcClient) {
 		this.jdbcClient = jdbcClient;
 	}
 
 	@Override
-	public boolean isAvailable(CirculatingBook.CopyId id) {
+	public boolean isAvailable(LendableBook.CopyId id) {
 		Objects.requireNonNull(id);
 
 		final String sql = """
@@ -45,19 +45,19 @@ public class CirculationJdbcRepository implements CirculationRepository {
 	}
 
 	@Override
-	public CirculatingBook.Snapshot save(CirculatingBook.Snapshot circulatingBook) {
-		Objects.requireNonNull(circulatingBook);
+	public LendableBook.Snapshot save(LendableBook.Snapshot book) {
+		Objects.requireNonNull(book);
 
 		logger.debug("Save circulating book");
 
-		if (this.alreadyExists(circulatingBook.id())) {
-			return this.update(circulatingBook);
+		if (this.alreadyExists(book.id())) {
+			return this.update(book);
 		}
-		return this.insert(circulatingBook);
+		return this.insert(book);
 	}
 
 	@Override
-	public Optional<CirculatingBook.Snapshot> findById(CirculatingBook.Id id) {
+	public Optional<LendableBook.Snapshot> findById(LendableBook.Id id) {
 		Objects.requireNonNull(id);
 
 		final String sql = """
@@ -70,11 +70,11 @@ public class CirculationJdbcRepository implements CirculationRepository {
 
 		return jdbcClient.sql(sql)
 			.param("id", id)
-			.query(new CirculatingBookSnapshotRowMapper())
+			.query(new LendableBookSnapshotRowMapper())
 			.optional();
 	}
 
-	private boolean alreadyExists(CirculatingBook.Id id) {
+	private boolean alreadyExists(LendableBook.Id id) {
 		String sql = """
 			select count(*) > 0 
 			from Loan 
@@ -89,10 +89,10 @@ public class CirculationJdbcRepository implements CirculationRepository {
 		return result > 0;
 	}
 
-	private CirculatingBook.Snapshot update(CirculatingBook.Snapshot circulatingBook) {
+	private LendableBook.Snapshot update(LendableBook.Snapshot circulatingBook) {
 		Objects.requireNonNull(circulatingBook);
 
-		final var params = CirculationSqlParamsFactory.create(circulatingBook);
+		final var params = LendingSqlParamsFactory.create(circulatingBook);
 		final String sql = """
 			UPDATE Loan
 			SET copyId = :copyId,
@@ -112,10 +112,10 @@ public class CirculationJdbcRepository implements CirculationRepository {
 		return circulatingBook;
 	}
 
-	private CirculatingBook.Snapshot insert(CirculatingBook.Snapshot circulatingBook) {
+	private LendableBook.Snapshot insert(LendableBook.Snapshot circulatingBook) {
 		Objects.requireNonNull(circulatingBook);
 
-		final var params = CirculationSqlParamsFactory.create(circulatingBook);
+		final var params = LendingSqlParamsFactory.create(circulatingBook);
 		final String sql = """
 			INSERT INTO Loan (id, copyId, userId, expectedReturnDate, returnedAt)
 			VALUES (:id, :copyId, :userId, :expectedReturnDate, :returnedAt)

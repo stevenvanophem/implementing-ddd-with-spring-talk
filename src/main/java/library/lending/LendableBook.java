@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
-public class CirculatingBook {
+public class LendableBook {
 
 	private final Id id;
 	private final CopyId copyId;
@@ -15,20 +15,20 @@ public class CirculatingBook {
 	private LocalDate expectedReturnDate;
 	private LocalDateTime returnedAt;
 
-	private CirculatingBook(Id id, Checkout checkout) {
-		Objects.requireNonNull(id, "circulating book id missing");
-		Objects.requireNonNull(checkout, "checkout missing");
+	private LendableBook(Id id, Rent rent) {
+		Objects.requireNonNull(id, "lendable book id missing");
+		Objects.requireNonNull(rent, "checkout missing");
 
 		this.id = id;
-		this.copyId = checkout.copyId();
-		this.userId = checkout.userId();
+		this.copyId = rent.copyId();
+		this.userId = rent.userId();
 	}
 
-	static CirculatingBook checkout(Id id, Checkout checkout) {
-		return new CirculatingBook(id, checkout);
+	static LendableBook rent(Id id, Rent rent) {
+		return new LendableBook(id, rent);
 	}
 
-	private CirculatingBook(Snapshot snapshot) {
+	private LendableBook(Snapshot snapshot) {
 		Objects.requireNonNull(snapshot);
 		this.id = snapshot.id();
 		this.copyId = snapshot.copyId();
@@ -38,11 +38,11 @@ public class CirculatingBook {
 		this.returnedAt = snapshot.returnedAt();
 	}
 
-	static CirculatingBook load(Snapshot snapshot) {
-		return new CirculatingBook(snapshot);
+	static LendableBook load(Snapshot snapshot) {
+		return new LendableBook(snapshot);
 	}
 
-	CirculatingBook checkin() {
+	LendableBook checkin() {
 		this.returnedAt = LocalDateTime.now();
 		if (this.returnedAt.isAfter(expectedReturnDate.atStartOfDay())) {
 			// calculate fee
@@ -51,7 +51,14 @@ public class CirculatingBook {
 	}
 
 	public Snapshot snapshot() {
-		return new Snapshot(id, copyId, userId, createdAt, expectedReturnDate, returnedAt);
+		return new Snapshot(
+			id,
+			copyId,
+			userId,
+			createdAt,
+			expectedReturnDate,
+			returnedAt
+		);
 	}
 
 	public record Snapshot(
@@ -64,7 +71,7 @@ public class CirculatingBook {
 	) {
 
 		public Snapshot {
-			Objects.requireNonNull(id, "circulating book id missing");
+			Objects.requireNonNull(id, "book id missing");
 			Objects.requireNonNull(copyId, "copy id missing");
 			Objects.requireNonNull(userId, "user id missing");
 			Objects.requireNonNull(createdAt, "created at missing");
@@ -79,7 +86,7 @@ public class CirculatingBook {
 	public record Id(UUID value) {
 
 		public Id {
-			Objects.requireNonNull(value, "circulating book id missing");
+			Objects.requireNonNull(value, "book id missing");
 		}
 
 		public static Id generate() {
@@ -139,35 +146,35 @@ public class CirculatingBook {
 
 	}
 
-	public record Checkout(CopyId copyId, UserId userId) {
+	public record Rent(CopyId copyId, UserId userId) {
 
-		public Checkout {
+		public Rent {
 			Objects.requireNonNull(copyId, "copy id missing");
 			Objects.requireNonNull(userId, "user id missing");
 		}
 
 	}
 
-	public record CheckedOut(CirculatingBook.Snapshot circulatingBook) {
+	public record Rented(LendableBook.Snapshot book) {
 
-		public CheckedOut {
-			Objects.requireNonNull(circulatingBook, "circulating book missing");
+		public Rented {
+			Objects.requireNonNull(book, "book missing");
 		}
 
 	}
 
-	public record Checkin(Id id) {
+	public record Return(Id id) {
 
-		public Checkin {
-			Objects.requireNonNull(id, "circulating book id missing");
+		public Return {
+			Objects.requireNonNull(id, "book id missing");
 		}
 
 	}
 
-	public record CheckedIn(CirculatingBook.Snapshot circulatingBook) {
+	public record Returned(LendableBook.Snapshot book) {
 
-		public CheckedIn {
-			Objects.requireNonNull(circulatingBook, "circulating book missing");
+		public Returned {
+			Objects.requireNonNull(book, "book missing");
 		}
 
 	}
