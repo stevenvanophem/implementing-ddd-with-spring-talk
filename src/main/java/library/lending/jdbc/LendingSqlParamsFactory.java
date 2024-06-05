@@ -9,11 +9,11 @@ class LendingSqlParamsFactory {
 	private LendingSqlParamsFactory() {
 	}
 
-	static Map<String, Object> create(LendableBook.Snapshot book) {
+	static Map<String, Object> create(LendableBook book) {
 		return Map.of(
-			"id", book.id(),
-			"volumeId", book.copyId(),
-			"userId", book.userId(),
+			"id", book.id().toString(),
+			"volumeId", book.volumeId().toString(),
+			"userId", book.userId().toString(),
 			"expectedReturnDate", book.expectedReturnDate(),
 			"returnedAt", book.returnedAt()
 		);

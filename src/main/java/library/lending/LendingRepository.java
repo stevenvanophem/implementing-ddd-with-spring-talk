@@ -8,9 +8,9 @@ public interface LendingRepository {
 
 	boolean isAvailable(Volume.Id id);
 
-	LendableBook.Snapshot save(LendableBook.Snapshot book);
+	LendableBook save(LendableBook book);
 
-	Optional<LendableBook.Snapshot> findById(LendableBook.Id id);
+	Optional<LendableBook> findById(LendableBook.Id id);
 
 }
 

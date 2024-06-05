@@ -3,6 +3,7 @@ package library.lending;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -17,31 +18,30 @@ public class LendableBook {
 	private LocalDate expectedReturnDate;
 	private LocalDateTime returnedAt;
 
-	private LendableBook(Id id, Rent rent) {
-		Objects.requireNonNull(id, "lendable book id missing");
+	private LendableBook(Rent rent) {
 		Objects.requireNonNull(rent, "checkout missing");
 
-		this.id = id;
+		this.id = Id.generate();
 		this.volumeId = rent.volumeId();
 		this.userId = rent.userId();
 	}
 
-	static LendableBook rent(Id id, Rent rent) {
-		return new LendableBook(id, rent);
+	static LendableBook rent(Rent rent) {
+		return new LendableBook(rent);
 	}
 
-	private LendableBook(Snapshot snapshot) {
-		Objects.requireNonNull(snapshot);
-		this.id = snapshot.id();
-		this.volumeId = snapshot.volumeId();
-		this.userId = snapshot.userId();
-		this.createdAt = snapshot.createdAt();
-		this.expectedReturnDate = snapshot.expectedReturnDate();
-		this.returnedAt = snapshot.returnedAt();
+	private LendableBook(Load load) {
+		Objects.requireNonNull(load);
+		this.id = load.id();
+		this.volumeId = load.volumeId();
+		this.userId = load.userId();
+		this.createdAt = load.createdAt();
+		this.expectedReturnDate = load.expectedReturnDate();
+		this.returnedAt = load.returnedAt();
 	}
 
-	static LendableBook load(Snapshot snapshot) {
-		return new LendableBook(snapshot);
+	public static LendableBook load(Load load) {
+		return new LendableBook(load);
 	}
 
 	LendableBook checkin() {
@@ -52,18 +52,35 @@ public class LendableBook {
 		return this;
 	}
 
-	public Snapshot snapshot() {
-		return new Snapshot(
-			id,
-			volumeId,
-			userId,
-			createdAt,
-			expectedReturnDate,
-			returnedAt
-		);
+	public <T> T map(Function<LendableBook, T> function) {
+		return function.apply(this);
 	}
 
-	public record Snapshot(
+	public Id id() {
+		return id;
+	}
+
+	public Volume.Id volumeId() {
+		return volumeId;
+	}
+
+	public UserId userId() {
+		return userId;
+	}
+
+	public Optional<LocalDateTime> createdAt() {
+		return Optional.ofNullable(createdAt);
+	}
+
+	public Optional<LocalDate> expectedReturnDate() {
+		return Optional.ofNullable(expectedReturnDate);
+	}
+
+	public Optional<LocalDateTime> returnedAt() {
+		return Optional.ofNullable(returnedAt);
+	}
+
+	public record Load(
 		Id id,
 		Volume.Id volumeId,
 		UserId userId,
@@ -72,15 +89,11 @@ public class LendableBook {
 		LocalDateTime returnedAt
 	) {
 
-		public Snapshot {
+		public Load {
 			Objects.requireNonNull(id, "book id missing");
 			Objects.requireNonNull(volumeId, "volume id missing");
 			Objects.requireNonNull(userId, "user id missing");
 			Objects.requireNonNull(createdAt, "created at missing");
-		}
-
-		public <T> T map(Function<Snapshot, T> function) {
-			return function.apply(this);
 		}
 
 	}
@@ -136,7 +149,7 @@ public class LendableBook {
 
 	}
 
-	public record Rented(LendableBook.Snapshot book) {
+	public record Rented(LendableBook book) {
 
 		public Rented {
 			Objects.requireNonNull(book, "book missing");
@@ -152,7 +165,7 @@ public class LendableBook {
 
 	}
 
-	public record Returned(LendableBook.Snapshot book) {
+	public record Returned(LendableBook book) {
 
 		public Returned {
 			Objects.requireNonNull(book, "book missing");

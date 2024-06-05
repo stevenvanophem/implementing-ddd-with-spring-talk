@@ -22,7 +22,7 @@ public class LendingService {
 		this.repository = repository;
 	}
 
-	public LendableBook.Snapshot rent(LendableBook.Rent command) {
+	public LendableBook rent(LendableBook.Rent command) {
 		Objects.requireNonNull(command);
 
 		final Volume.Id volumeId = command.volumeId();
@@ -34,12 +34,12 @@ public class LendingService {
 		if (!repository.isAvailable(volumeId))
 			throw new LendableBook.Unavailable(volumeId);
 
-		return LendableBook.rent(id, command).snapshot()
+		return LendableBook.rent(command)
 			.map(repository::save)
 			.map(eventPublisher::checkedOut);
 	}
 
-	public LendableBook.Snapshot checkin(LendableBook.Return command) {
+	public LendableBook checkin(LendableBook.Return command) {
 		Objects.requireNonNull(command);
 
 		final LendableBook.Id id = command.id();
@@ -48,9 +48,7 @@ public class LendingService {
 		logger.trace("{}", command);
 
 		return repository.findById(id).orElseThrow(() -> new LendableBook.Unknown(id))
-			.map(LendableBook::load)
 			.checkin()
-			.snapshot()
 			.map(repository::save)
 			.map(eventPublisher::checkedIn);
 	}

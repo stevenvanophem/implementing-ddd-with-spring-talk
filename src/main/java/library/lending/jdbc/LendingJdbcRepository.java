@@ -46,7 +46,7 @@ public class LendingJdbcRepository implements LendingRepository {
 	}
 
 	@Override
-	public LendableBook.Snapshot save(LendableBook.Snapshot book) {
+	public LendableBook save(LendableBook book) {
 		Objects.requireNonNull(book);
 
 		logger.debug("Save circulating book");
@@ -58,7 +58,7 @@ public class LendingJdbcRepository implements LendingRepository {
 	}
 
 	@Override
-	public Optional<LendableBook.Snapshot> findById(LendableBook.Id id) {
+	public Optional<LendableBook> findById(LendableBook.Id id) {
 		Objects.requireNonNull(id);
 
 		final String sql = """
@@ -90,7 +90,7 @@ public class LendingJdbcRepository implements LendingRepository {
 		return result > 0;
 	}
 
-	private LendableBook.Snapshot update(LendableBook.Snapshot circulatingBook) {
+	private LendableBook update(LendableBook circulatingBook) {
 		Objects.requireNonNull(circulatingBook);
 
 		final var params = LendingSqlParamsFactory.create(circulatingBook);
@@ -113,7 +113,7 @@ public class LendingJdbcRepository implements LendingRepository {
 		return circulatingBook;
 	}
 
-	private LendableBook.Snapshot insert(LendableBook.Snapshot circulatingBook) {
+	private LendableBook insert(LendableBook circulatingBook) {
 		Objects.requireNonNull(circulatingBook);
 
 		final var params = LendingSqlParamsFactory.create(circulatingBook);

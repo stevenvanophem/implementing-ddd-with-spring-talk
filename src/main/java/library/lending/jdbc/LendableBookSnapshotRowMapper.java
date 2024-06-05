@@ -8,24 +8,26 @@ import java.time.LocalDateTime;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.lang.NonNull;
 
+import library.inventory.Volume;
 import library.lending.LendableBook;
 
-class LendableBookSnapshotRowMapper implements RowMapper<LendableBook.Snapshot> {
+class LendableBookSnapshotRowMapper implements RowMapper<LendableBook> {
 
 	@Override
-	public LendableBook.Snapshot mapRow(@NonNull ResultSet resultSet, int rowNum) throws SQLException {
+	public LendableBook mapRow(@NonNull ResultSet resultSet, int rowNum) throws SQLException {
 		final LocalDateTime createdAt = resultSet.getObject("createdAt", LocalDateTime.class);
 		final LocalDate expectedReturnDate = resultSet.getObject("expectedReturnDate", LocalDate.class);
 		final LocalDateTime returnedAt = resultSet.getObject("returnedAt", LocalDateTime.class);
 
-		return new LendableBook.Snapshot(
+		LendableBook.Load command = new LendableBook.Load(
 			LendableBook.Id.fromString(resultSet.getString("id")),
-			LendableBook.CopyId.fromString(resultSet.getString("volumeId")),
+			Volume.Id.fromString(resultSet.getString("volumeId")),
 			LendableBook.UserId.fromString(resultSet.getString("userId")),
 			createdAt,
 			expectedReturnDate,
 			returnedAt
 		);
+		return LendableBook.load(command);
 	}
 
 }
